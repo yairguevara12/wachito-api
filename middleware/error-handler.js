@@ -1,3 +1,4 @@
+///look information about the middleware
 const customError = require('../errors/custom-error');
 const {statusCode } = require('http-status-codes');
 
