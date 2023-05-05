@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
 const mainRouter = require('./routes/main');
+const errorHandlerMiddleware = require('./middleware/error-handler');
+const notFoundMiddleware = require('./middleware/not-found');
 app.use(express.json());
 app.use('/api/v1',mainRouter);
-
+app.use(errorHandlerMiddleware);
+app.use(notFoundMiddleware);
 const port = process.env.PORT || 5000;
 
 const start = ()=>{
