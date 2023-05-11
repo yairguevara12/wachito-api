@@ -33,5 +33,19 @@ class Auth extends Database {
             throw new Error(error);
         }
     }
+    
+    async getUserID(params, limit = -1) {
+        try {
+            let sql = `SELECT id,username FROM users where hashed_password = ?`;
+            if (limit > -1) {
+                sql = sql + ' LIMIT ' + limit;
+            }
+            let data = await this.simpleselect(sql, params);
+            return data;
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
 }
 module.exports = Auth;

@@ -1,6 +1,7 @@
 const FactoryModel = require('../models/factoryModel');
 const pool = require('../database/connect');
 const Unaunthenticated = require("../errors/unaunthenticated");
+const BadRequest = require("../errors/bad-request");
 const bcrypt = require('bcrypt');
 
 class service {
@@ -46,12 +47,14 @@ class service {
                 console.log("END service.test  :)");
                 resolve(resultSelect);
             } catch (error) {
-                reject(error)
+                reject(new BadRequest('something went wrong, check out the db'))
+            } finally {
+                this.endConnection();
             }
         });
     }
 
-    validateUser(email, password) {
+    validateUser(email, plainPassword) {
         console.log("BEGIN service.createToken");
         return new Promise(async (resolve, reject) => {
             try {
@@ -61,29 +64,42 @@ class service {
                 const [dbemail] = await this.auth.getUserByEmail([email]);
 
                 if (!dbemail) {
-                    throw new Unaunthenticated('Invalid credentials');
+                    throw new Unaunthenticated('There is no user with this email');
                 }
 
-               
-                const isPasswordValid = await this.comparePassword(password,email);
 
-              
+                const hashedPassword = await this.auth.getHashedPassword(email);
 
+                const isPasswordValid = await bcrypt.compare(plainPassword, hashedPassword[0].hashed_password);
+                if (!isPasswordValid) {
+
+                    throw new Unaunthenticated('Email or password is incorrect');
+
+                }
+
+
+                const getUserInfo = await this.auth.getUserID(hashedPassword[0].hashed_password);
+
+                console.log(getUserInfo);
                 console.log("END service.createToken  :)");
-                resolve(isPasswordValid);
+                resolve(getUserInfo);
             } catch (error) {
                 reject(error)
+            } finally {
+                this.endConnection();
             }
         });
     }
-    async comparePassword(plainPassword,email) {
-        const hashedPassword = await this.auth.getHashedPassword(email);
-        console.log( typeof hashedPassword[0].hashed_password);
-        console.log( typeof plainPassword);
-        return await bcrypt.compare(plainPassword, hashedPassword[0].hashed_password);
-    };
+
     currentConnection() {
         return this.connection;
+    }
+
+    async endConnection() {
+        if (this.connection != null) {
+            this.connection.release();
+            console.log(" connection is released ");
+        }
     }
 }
 

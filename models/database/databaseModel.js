@@ -8,9 +8,9 @@ class Database {
                 this._initialized = true;
                 this.connection = service.currentConnection();
 
-                console.log(this.modelName + " initialized with service");
+                console.log('main SERVICE' + " initialized with service");
             } else {
-                console.log(this.modelName + " contains a service " + service.name + " with no connections");
+                console.log('main SERVICE' + " contains a service " + 'main SERVICE' + " with no connections");
             }
         }
     }
