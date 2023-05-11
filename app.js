@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const mainRouter = require('./routes/main');
@@ -10,21 +12,21 @@ app.use(notFoundMiddleware);
 const port = process.env.PORT || 5000;
 
 const start = ()=>{
-   /*  try {
+     try {
         app.listen(port, ()=>{
             console.log('Server is running on port', port);
         });
     } catch (error) {
         console.log(error);
-    } */
-    connection.connect((err) => {
+    } 
+   /*  connection.connect((err) => {
         if (err) {
           console.error('error connecting: ' + err.stack);
           return;
         }
       
         console.log('connected (suscessfully) as id ' + connection.threadId);
-      });
+      }); */
 }
 
 start();
