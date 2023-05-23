@@ -18,6 +18,16 @@ class User extends Database{
           throw new Error(error);
         }
       }
+    async registerUser(params) {
+      try {
+        let sql = `INSERT INTO users (username, password, email , hashed_password) VALUES
+        (?, ?, ?, ?) `;
+        let data = await this.insert(sql, params);
+        console.log("registeringUser--->" + data);
+      } catch (error) {
+        
+      }
+    }
 }
 
 module.exports = User ;

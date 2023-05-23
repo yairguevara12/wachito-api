@@ -3,7 +3,7 @@ const pool = require('../database/connect');
 const Unaunthenticated = require("../errors/unaunthenticated");
 const BadRequest = require("../errors/bad-request");
 const bcrypt = require('bcrypt');
-
+const crypto = require('crypto');
 class service {
     constructor() {
         this._connection = null;
@@ -91,10 +91,50 @@ class service {
         });
     }
 
+
+    registerUser(userName, plainPassword, email) {
+        console.log("BEGIN service.RegisterUser");
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.init();
+                // let resultSelect = await this.user.getTest();
+
+
+
+                const hashedPassword = await this.setHashedPassword(plainPassword);
+
+                if (!hashedPassword) {
+                    throw new Unaunthenticated('Email or password is incorrect');
+                }
+
+
+                const test = await this.user.registerUser([userName, plainPassword, email , hashedPassword]);
+
+                console.log("END service.RegisterUser  :)");
+                resolve(test);
+            } catch (error) {
+                reject(error)
+            } finally {
+                this.endConnection();
+            }
+        });
+    }
+
     currentConnection() {
         return this.connection;
     }
 
+    async setHashedPassword(plainPassword) {
+        try {
+            const hashedPassword = await bcrypt.hash(plainPassword, 10);
+            console.log('Passwords hashed successfully:');
+            console.log(hashedPassword)
+            return hashedPassword
+        } catch (error) {
+            console.error('Error hashing passwords:', error);
+            throw new BadRequest('ServerError');
+        }
+    }
     async endConnection() {
         if (this.connection != null) {
             this.connection.release();

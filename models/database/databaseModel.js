@@ -59,6 +59,24 @@ class Database {
             }
         })
     }
+    insert(sql, params){
+        return new Promise(async(resolve, reject) => {
+          let conn;
+          try {
+            conn = await this.createConnection();
+            console.log("[insert statement] => " + sql.replace(/\r/g, "").replace(/\n/g, "").replace(/  +/g, ' '))
+            console.log("[insert params   ] => " + params);
+    
+            const [rows] = await conn.query(sql, params);
+            resolve(rows)
+          } catch (error) {
+            console.log(error)
+            reject(error)
+          } finally {
+            this.release()
+          }
+        })
+      }
 }
 
 module.exports = Database;
